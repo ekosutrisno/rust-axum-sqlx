@@ -3,7 +3,10 @@ use std::sync::Arc;
 use axum::{routing::get, Router};
 use sqlx::{Pool, Postgres};
 
-use crate::handler::{create_note_handler, health_checker_handler, note_list_handler};
+use crate::handler::{
+    create_note_handler, delete_note_handler, edit_note_handler, get_note_handler,
+    health_checker_handler, note_list_handler,
+};
 
 #[allow(dead_code)]
 pub struct AppState {
@@ -18,6 +21,12 @@ pub fn create_router(pool: Pool<Postgres>) -> Router {
         .route(
             "/api/notes",
             get(note_list_handler).post(create_note_handler),
+        )
+        .route(
+            "/api/notes/:id",
+            get(get_note_handler)
+                .put(edit_note_handler)
+                .delete(delete_note_handler),
         )
         .with_state(app_state)
 }
