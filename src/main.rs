@@ -1,12 +1,12 @@
 use axum::{http::{
     header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE},
     HeaderValue, Method,
-}, Router};
+}, Router, middleware};
 use dotenv::dotenv;
 use sqlx::postgres::PgPoolOptions;
 use tower_http::cors::CorsLayer;
 
-use crate::{health::health_router, router::todo_router};
+use crate::{health::{health_router, main_response_mapper}, router::todo_router};
 
 mod handler;
 mod router;
@@ -43,6 +43,7 @@ async fn main() {
     let app = Router::new()
         .merge(health_router())
         .merge(todo_router(pool))
+        .layer(middleware::map_response(main_response_mapper))
         .layer(cors);
 
     println!("🚀 Server started successfully on port {}", 8081);
