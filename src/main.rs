@@ -1,16 +1,18 @@
-use axum::http::{
+use axum::{http::{
     header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE},
     HeaderValue, Method,
-};
+}, Router};
 use dotenv::dotenv;
-use router::create_router;
 use sqlx::postgres::PgPoolOptions;
 use tower_http::cors::CorsLayer;
+
+use crate::{health::health_router, router::todo_router};
 
 mod handler;
 mod router;
 mod model;
 mod schema;
+mod health;
 
 #[tokio::main]
 async fn main() {
@@ -38,7 +40,10 @@ async fn main() {
         .allow_credentials(true)
         .allow_headers([AUTHORIZATION, ACCEPT, CONTENT_TYPE]);
 
-    let app = create_router(pool).layer(cors);
+    let app = Router::new()
+        .merge(health_router())
+        .merge(todo_router(pool))
+        .layer(cors);
 
     println!("🚀 Server started successfully on port {}", 8081);
     axum::Server::bind(&"0.0.0.0:8081".parse().unwrap())

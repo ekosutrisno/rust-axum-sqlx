@@ -15,17 +15,6 @@ use uuid::Uuid;
 
 use crate::{router::AppState, schema::FilterOptions};
 
-pub async fn health_checker_handler() -> impl IntoResponse {
-    const MESSAGE: &str = "Axum & SQLX & POSTGRES";
-
-    let json_response = json!({
-        "status": "success",
-        "message": MESSAGE
-    });
-
-    Json(json_response)
-}
-
 pub async fn note_list_handler(
     opts: Option<Query<FilterOptions>>,
     State(data): State<Arc<AppState>>,
