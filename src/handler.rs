@@ -148,8 +148,7 @@ pub async fn edit_note_handler(
         id
     )
     .fetch_one(&data.db)
-    .await
-    ;
+    .await;
 
     match query_result {
         Ok(note) => {
